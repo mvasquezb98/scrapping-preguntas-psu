@@ -1,6 +1,4 @@
-# Se ignoran archivos relacionados con python
 .venv
 __pycache__
-
-# Se ignoran los outputs del código
 output/
+.env
