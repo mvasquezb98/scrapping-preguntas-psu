@@ -7,6 +7,7 @@ import pandas as pd
 from collections import defaultdict
 from collections.abc import Mapping
 import re
+from datetime import datetime
 
 from io import BytesIO
 from PIL import Image
@@ -436,3 +437,23 @@ def categorize_questions(df_questions: pd.DataFrame):
     final_dict = merge_question_dicts(list_dicts)
 
     return final_dict
+
+def run_categorization(df_questions: pd.DataFrame,output_path: str):
+    for doc in df_questions['pdf_file'].unique():
+        try:
+            df_doc = df_questions[df_questions['pdf_file'] == doc]
+            final_dict_path = Path(output_path+f"dict_PAES_{doc}.json")
+            if not final_dict_path.exists():    
+                inicio = datetime.now()
+                final_dict = categorize_questions(df_doc)
+                final=datetime.now()
+                delta = final - inicio
+                print(f"Tiempo de ejecución {doc}: {delta}")
+
+                with final_dict_path.open("w", encoding="utf-8") as f: # type: ignore
+                    json.dump(final_dict, f, ensure_ascii=False, indent=2, sort_keys=True)
+            else:
+                print(f"El archivo {final_dict_path} ya existe. Se omite la categorización para {doc}.")
+        except Exception as e:
+            print(f"Error processing {doc}: {e}")
+    
